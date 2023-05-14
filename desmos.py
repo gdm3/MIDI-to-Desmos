@@ -1,7 +1,8 @@
-#Equation is capped at 259 individual lines
-
 import mido
-mid = mido.MidiFile('Super Mario 64 - Medley.mid', clip=True)
+# Change this to the path of the midi file you want to convert
+pathOfMidi = "Super Mario 64 - Medley.mid"
+
+mid = mido.MidiFile(pathOfMidi, clip=True)
 alph = "abcdefghijklmnopqrstuvwz"
 
 # Clear output file
@@ -17,26 +18,28 @@ def calculateDuration(note):
             #calculate duration of note
             i.append(currentNoteTime - i[1])
     return False
+def checkIfNote(msg):
+    #Check if message is a note
+    try:
+        msg.velocity
+        return True
+    except AttributeError:
+        return False
+    
 #Each note is an array with the following format: [note, start time (in ticks), duration]
 notes = []
 #Duration of a tick in milliseconds
 tick_duration = 50000/ mid.ticks_per_beat
 #Current time of note
 currentNoteTime = 0
+
 #Loop through mid and find notes
 for i, track in enumerate(mid.tracks):
     for msg in track:
-
-        note = False
         if type(msg) == mido.MetaMessage: #Contains tempo - deal with later
             pass
-        try:
-            msg.velocity
-            note = True
-        except AttributeError:
-            #Not a note, do nothing
-            pass
-        if note == False:
+        if checkIfNote(msg) == False:
+            #Not a note
             pass
         elif msg.type == 'set_tempo':
             tick_duration = msg.tempo / mid.ticks_per_beat
@@ -44,7 +47,7 @@ for i, track in enumerate(mid.tracks):
             #Create new note entry - [note, start time, ID, IDnum] - does not include duration as it is unknown at this point
             currentNoteTime += msg.time
             if len(notes) > 0:
-                #Find the correct letter for the note from the previous note
+                #Find the correct letter for the current note from the previous note
                 positionInStringOfLastLetter = alph.find(notes[-1][2])
                 if positionInStringOfLastLetter == 23:
                     #Last letter was z, reset to a
@@ -62,8 +65,8 @@ for i, track in enumerate(mid.tracks):
                     correctID = 0
                     pass
                 notes.append([msg.note, currentNoteTime, letter, correctID])
-            else:
-                
+            #First note - just make it a
+            else:         
                 notes.append([msg.note, currentNoteTime, 'a', 0])
         else: 
             # Note off event
