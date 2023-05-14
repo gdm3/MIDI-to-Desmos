@@ -7,5 +7,5 @@ A simple python scipt to convert an MIDI file to a desmos graph.
 3. Paste all of the individual note equations into a folder in desmos
 4. Paste the join message into a new desmos line after the folder
 # Current limitations
-* Note values are not accurate - will fix my converting to hz and then to desmos 
+* Note values are not accurate - will fix by converting to hz and then to desmos 
 * Program is laggy above ~250 notes
