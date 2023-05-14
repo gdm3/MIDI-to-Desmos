@@ -64,7 +64,6 @@ for i, track in enumerate(mid.tracks):
                     i.append(currentNoteTime - i[1])
                     break
             
-print(notes)
 factorToDivide = 6
 # Create equations for each note
 joinMessageFactory = []
@@ -85,6 +84,7 @@ for i in joinMessageFactory:
         joinMessage += i[0] + "_{" +  i[1] + "},"
 joinMessage += ")"
 writeToOutput(joinMessage)
-print(joinMessage)
+
+print("Success!")
             
     
