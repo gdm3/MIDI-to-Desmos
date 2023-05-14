@@ -4,7 +4,9 @@ import mido
 mid = mido.MidiFile('Super Mario 64 - Medley.mid', clip=True)
 alph = "abcdefghijklmnopqrstuvwz"
 
-    
+def writeToOutput(text):
+    with open("output.txt", "a") as output:
+        output.write(text + "\n")
 #Each note is an array with the following format: [note, start time (in ticks), duration]
 notes = []
 #Duration of a tick in milliseconds
@@ -73,8 +75,7 @@ for j in notes:
     else:
         joinMessageFactory.append([j[2], str(j[3])])
         equation = str(j[2]) + "_{" + str(j[3])+ "} = " + str(round((j[0] / factorToDivide), 2)) + "\\left\\{0<x<" + str(j[4] / 500) + "\\right\\}"
-    with open("output.txt", "a") as output:
-        output.write(equation + "\n")
+    writeToOutput(equation)
 # Create equation to join all the notes together
 joinMessage = "join("
 for i in joinMessageFactory:
@@ -83,6 +84,7 @@ for i in joinMessageFactory:
     else:
         joinMessage += i[0] + "_{" +  i[1] + "},"
 joinMessage += ")"
+writeToOutput(joinMessage)
 print(joinMessage)
             
     
