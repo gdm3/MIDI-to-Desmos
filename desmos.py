@@ -4,9 +4,19 @@ import mido
 mid = mido.MidiFile('Super Mario 64 - Medley.mid', clip=True)
 alph = "abcdefghijklmnopqrstuvwz"
 
+# Clear output file
+open('output.txt', 'w').close()
+
 def writeToOutput(text):
     with open("output.txt", "a") as output:
         output.write(text + "\n")
+def calculateDuration(note):
+    #Calculate duration of note in ticks
+    for i in reversed(notes):
+        if i[0] == note:
+            #calculate duration of note
+            i.append(currentNoteTime - i[1])
+    return False
 #Each note is an array with the following format: [note, start time (in ticks), duration]
 notes = []
 #Duration of a tick in milliseconds
@@ -16,6 +26,7 @@ currentNoteTime = 0
 #Loop through mid and find notes
 for i, track in enumerate(mid.tracks):
     for msg in track:
+
         note = False
         if type(msg) == mido.MetaMessage: #Contains tempo - deal with later
             pass
@@ -58,11 +69,7 @@ for i, track in enumerate(mid.tracks):
             # Note off event
             # Find the correct note in notes and add duration to it - [note, start time, ID, IDnum], duration
             currentNoteTime += msg.time
-            for i in reversed(notes):
-                if i[0] == msg.note:
-                    #calculate duration of note
-                    i.append(currentNoteTime - i[1])
-                    break
+            calculateDuration(msg.note)
             
 factorToDivide = 6
 # Create equations for each note
