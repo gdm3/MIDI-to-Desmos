@@ -14,9 +14,20 @@ currentNoteTime = 0
 #Loop through mid and find notes
 for i, track in enumerate(mid.tracks):
     for msg in track:
-        if msg.type == 'set_tempo':
+        note = False
+        if type(msg) == mido.MetaMessage: #Contains tempo - deal with later
+            pass
+        try:
+            msg.velocity
+            note = True
+        except AttributeError:
+            #Not a note, do nothing
+            pass
+        if note == False:
+            pass
+        elif msg.type == 'set_tempo':
             tick_duration = msg.tempo / mid.ticks_per_beat
-        if msg.type == 'note_on':
+        elif msg.velocity != 0:
             #Create new note entry - [note, start time, ID, IDnum] - does not include duration as it is unknown at this point
             currentNoteTime += msg.time
             if len(notes) > 0:
@@ -41,8 +52,9 @@ for i, track in enumerate(mid.tracks):
             else:
                 
                 notes.append([msg.note, currentNoteTime, 'a', 0])
-        elif msg.type == 'note_off':
-            #Find the correct note in notes and add duration to it - [note, start time, ID, IDnum], duration
+        else: 
+            # Note off event
+            # Find the correct note in notes and add duration to it - [note, start time, ID, IDnum], duration
             currentNoteTime += msg.time
             for i in reversed(notes):
                 if i[0] == msg.note:
@@ -52,7 +64,7 @@ for i, track in enumerate(mid.tracks):
             
 print(notes)
 factorToDivide = 6
-
+# Create equations for each note
 joinMessageFactory = []
 for j in notes:
     if j[3] == 0:
@@ -61,8 +73,9 @@ for j in notes:
     else:
         joinMessageFactory.append([j[2], str(j[3])])
         equation = str(j[2]) + "_{" + str(j[3])+ "} = " + str(round((j[0] / factorToDivide), 2)) + "\\left\\{0<x<" + str(j[4] / 500) + "\\right\\}"
-    print(equation)
-    #equation = "{}_{} = ".format(j[2], j[3])
+    with open("output.txt", "a") as output:
+        output.write(equation + "\n")
+# Create equation to join all the notes together
 joinMessage = "join("
 for i in joinMessageFactory:
     if len(i) == 1:
