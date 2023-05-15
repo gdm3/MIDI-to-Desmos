@@ -1,4 +1,4 @@
-import mido
+import mido, math
 # Change this to the path of the midi file you want to convert
 pathOfMidi = "Super Mario 64 - Medley.mid"
 
@@ -7,7 +7,10 @@ alph = "abcdefghijklmnopqrstuvwz"
 
 # Clear output file
 open('output.txt', 'w').close()
-
+    
+def midiToHertz(midiNote):
+    #Convert midi note to hertz
+    return 440 * math.pow(2, (midiNote - 69) / 12)
 def writeToOutput(text):
     with open("output.txt", "a") as output:
         output.write(text + "\n")
@@ -63,7 +66,7 @@ for i, track in enumerate(mid.tracks):
                 else:
                     #No note with that letter found, add new note
                     correctID = 0
-                    pass
+                    
                 notes.append([msg.note, currentNoteTime, letter, correctID])
             #First note - just make it a
             else:         
@@ -80,10 +83,10 @@ joinMessageFactory = []
 for j in notes:
     if j[3] == 0:
         joinMessageFactory.append([j[2]])
-        equation = "{} = {}\\left\\".format(j[2], round((j[0] / factorToDivide), 2)) + "{0<x<" + str(j[4] / 500) + "\\right\\}"
+        equation = "{} = {}\\left\\".format(j[2], round(midiToHertz(j[0]))) + "{0<x<" + str(j[4] / 500) + "\\right\\}"
     else:
         joinMessageFactory.append([j[2], str(j[3])])
-        equation = str(j[2]) + "_{" + str(j[3])+ "} = " + str(round((j[0] / factorToDivide), 2)) + "\\left\\{0<x<" + str(j[4] / 500) + "\\right\\}"
+        equation = str(j[2]) + "_{" + str(j[3])+ "} = " + str(round(midiToHertz(j[0]))) + "\\left\\{0<x<" + str(j[4] / 500) + "\\right\\}"
     writeToOutput(equation)
 # Create equation to join all the notes together
 joinMessage = "join("
